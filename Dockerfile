@@ -1,11 +1,7 @@
-FROM golang:1.17-alpine AS build
-
+FROM golang:1.17-alpine AS server
 ENV HTTPS_PROXY="http://fodev.org:8118"
-
 WORKDIR /app
-
 COPY . ./
-
 # Install dependencies
 RUN go mod download && \
   # Build the app
@@ -13,15 +9,19 @@ RUN go mod download && \
   # Make the final output executable
   chmod +x ./main
 
-FROM alpine:latest
-
-# Install os packages
-RUN apk --no-cache add bash
-
+FROM node:17-alpine AS app
+ENV NODE_ENV production
 WORKDIR /app
+COPY ./app/package.json .
+COPY ./app/package-lock.json .
+RUN npm ci
+COPY ./app .
+RUN npm run build
 
-COPY --from=build /app/main .
-
+FROM alpine:latest
+RUN apk --no-cache add bash
+WORKDIR /app
+COPY --from=server /app/main .
+COPY --from=app /app/build ./app/build/
 CMD ["./main"]
-
 EXPOSE 8000
