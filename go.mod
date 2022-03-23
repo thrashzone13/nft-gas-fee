@@ -1,4 +1,4 @@
-module github.com/thrashzone13/gas-fee
+module github.com/thrashzone13/nft-gas-fee
 
 go 1.17
 

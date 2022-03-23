@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mandrigin/gin-spa/spa"
-	"github.com/thrashzone13/gas-fee/service"
+	"github.com/thrashzone13/nft-gas-fee/service"
 )
 
 func main() {
