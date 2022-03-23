@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 type CryptonatorService struct{}
@@ -18,22 +19,24 @@ func NewCryptonatorService() *CryptonatorService {
 }
 
 func (s *CryptonatorService) Get() *CryptonatorResponse {
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
 
 	req, err := http.NewRequest("GET", "https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=ETH", nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	var response CryptonatorResponse
