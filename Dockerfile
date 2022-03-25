@@ -1,5 +1,5 @@
 FROM golang:1.17-alpine AS server
-ENV HTTPS_PROXY="http://fodev.org:8118"
+ENV HTTPS_PROXY="https://free.shecan.ir/dns-query"
 WORKDIR /app
 COPY . ./
 # Install dependencies
