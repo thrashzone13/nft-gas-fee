@@ -1,42 +1,57 @@
 import React, { useEffect, useState } from "react";
-import { Accordion } from "react-bootstrap";
+import { Accordion, Button, ButtonGroup, ListGroup } from "react-bootstrap";
+import _ from "lodash";
 
 function App() {
-  const [data, setData] = useState([])
+  const [data, fetchData] = useState({})
+  const [type, setType] = useState('average')
+
+  const getData = () => {
+    var url = !process.env.NODE_ENV || process.env.NODE_ENV === 'production' ? 'docker.internal.host/price' : 'http://localhost:8080/price';
+    fetch(url)
+      .then(res => res.json())
+      .then(res => fetchData(res))
+  }
 
   useEffect(() => {
-      const interval = setInterval(() => {
-        fetch("http://localhost:8080/price")
-          .then(result => result.json())
-          .then(result => setData(result))
-      }, 10000)
-      console.log(data);
-      return () => {
-        clearInterval(interval);
-      }
+    getData()
   }, [])
 
-  return (
-<Accordion>
-  <Accordion.Item eventKey="0">
-    <Accordion.Header>Accordion Item #1</Accordion.Header>
-    <Accordion.Body>
+  const {
+    contracts = {},
+    eth = 0,
+    gwei = {}
+  } = data;
 
-    </Accordion.Body>
-  </Accordion.Item>
-  <Accordion.Item eventKey="1">
-    <Accordion.Header>Accordion Item #2</Accordion.Header>
-    <Accordion.Body>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-      velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-      cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-      est laborum.
-    </Accordion.Body>
-  </Accordion.Item>
-</Accordion>
+  return (
+    <>
+      <ButtonGroup size="lg" className="mb-2">
+        <Button onClick={()=>setType('low')}>Low</Button>
+        <Button onClick={()=>setType('average')}>Average</Button>
+        <Button onClick={()=>setType('fast')}>Fast</Button>
+      </ButtonGroup>
+      <Accordion>
+        {Object.keys(contracts).map((c, i) => <Accordion.Item eventKey={i}>
+          <Accordion.Header>{_.upperCase(c)}</Accordion.Header>
+          <Accordion.Body>
+            <ListGroup variant="flush">
+              {Object.keys(contracts[c]).map((v, i) =>
+                <ListGroup.Item
+                  key={i}
+                  as="li"
+                  className="d-flex justify-content-between align-items-start"
+                >
+                  <p>{_.upperCase(v)}</p>
+                  <p>{((gwei[type] * contracts[c][v] * 0.000000001) / eth).toFixed()} $</p>
+                </ListGroup.Item>
+              )}
+            </ListGroup>
+          </Accordion.Body>
+        </Accordion.Item>
+        )}
+      </Accordion>
+    </>
+
   );
 }
 

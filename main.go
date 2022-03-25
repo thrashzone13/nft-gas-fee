@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/mandrigin/gin-spa/spa"
 	"github.com/thrashzone13/nft-gas-fee/service"
@@ -14,6 +15,7 @@ func main() {
 
 	r := gin.Default()
 	r.Use(gin.Recovery())
+	r.Use(cors.Default())
 	r.GET("/price", func(c *gin.Context) {
 		gwei := gas.Get()
 		eth := crp.Get()
@@ -26,7 +28,7 @@ func main() {
 					"buy_nft": 503542,
 				},
 				"async_art": {
-					"use_control_toke":    71472,
+					"use_control_token":   71472,
 					"setup_control_token": 383225,
 					"mint_nft":            710405,
 					"bid_on_nft":          183398,
